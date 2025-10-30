@@ -150,6 +150,7 @@ function rgbToHex(r, g, b) {
   };
   return "#" + [r, g, b].map(toHex).join('').toUpperCase();
 }
+
 const $ = id => document.getElementById(id);
 const parts = {
   rInput: $('rInput'), gInput: $('gInput'), bInput: $('bInput'),
@@ -190,19 +191,27 @@ function setCMYKUI(c, m, y, k) {
 }
 
 function setHSVUI(h, s, v) {
-  parts.hInput.value = Number(round(h)).toFixed(3);
+  const hValue = Number(round(h)).toFixed(3);
+  const hForRange = hValue === '360.000' ? 360 : hValue;
+  
+  parts.hInput.value = hValue;
   parts.sInput.value = Number(round(s)).toFixed(3);
   parts.vInput.value = Number(round(v)).toFixed(3);
-  parts.hRange.value = Number(round(h)).toFixed(3);
+  
+  parts.hRange.value = hForRange;
   parts.sRange.value = Number(round(s)).toFixed(3);
   parts.vRange.value = Number(round(v)).toFixed(3);
 }
 
 function setHSLUI(h, s, l) {
-  parts.hhInput.value = Number(round(h)).toFixed(3);
+  const hValue = Number(round(h)).toFixed(3);
+  const hForRange = hValue === '360.000' ? 360 : hValue;
+  
+  parts.hhInput.value = hValue;
   parts.slInput.value = Number(round(s)).toFixed(3);
   parts.llInput.value = Number(round(l)).toFixed(3);
-  parts.hhRange.value = Number(round(h)).toFixed(3);
+  
+  parts.hhRange.value = hForRange;
   parts.slRange.value = Number(round(s)).toFixed(3);
   parts.llRange.value = Number(round(l)).toFixed(3);
 }
@@ -279,7 +288,13 @@ function updateFromHSV(h, s, v) {
   if (suspend) return;
   suspend = true;
   try {
-    const hn = ((toNumber(h) % 360) + 360) % 360;
+    let hn = toNumber(h);
+    if (hn === 360) {
+      hn = 360; 
+    } else {
+      hn = ((hn % 360) + 360) % 360; 
+    }
+    
     const sn = clamp(toNumber(s), 0, 100);
     const vn = clamp(toNumber(v), 0, 100);
     setHSVUI(hn, sn, vn);
@@ -292,7 +307,13 @@ function updateFromHSL(h, s, l) {
   if (suspend) return;
   suspend = true;
   try {
-    const hn = ((toNumber(h) % 360) + 360) % 360;
+    let hn = toNumber(h);
+    if (hn === 360) {
+      hn = 360; 
+    } else {
+      hn = ((hn % 360) + 360) % 360; 
+    }
+    
     const sn = clamp(toNumber(s), 0, 100);
     const ln = clamp(toNumber(l), 0, 100);
     setHSLUI(hn, sn, ln);
@@ -365,12 +386,28 @@ function attachEvents() {
 
   ['h', 's', 'v'].forEach(ch => {
     if (parts[ch + 'Input']) parts[ch + 'Input'].addEventListener('input', () => updateFromHSV(parts.hInput.value, parts.sInput.value, parts.vInput.value));
-    if (parts[ch + 'Range']) parts[ch + 'Range'].addEventListener('input', () => updateFromHSV(parts.hRange.value, parts.sRange.value, parts.vRange.value));
+    if (parts[ch + 'Range']) {
+      parts[ch + 'Range'].addEventListener('input', () => {
+        let hValue = parts.hRange.value;
+        if (ch === 'h' && hValue >= 359.5) {
+          hValue = 360;
+        }
+        updateFromHSV(hValue, parts.sRange.value, parts.vRange.value);
+      });
+    }
   });
 
   ['hh', 'sl', 'll'].forEach(ch => {
     if (parts[ch + 'Input']) parts[ch + 'Input'].addEventListener('input', () => updateFromHSL(parts.hhInput.value, parts.slInput.value, parts.llInput.value));
-    if (parts[ch + 'Range']) parts[ch + 'Range'].addEventListener('input', () => updateFromHSL(parts.hhRange.value, parts.slRange.value, parts.llRange.value));
+    if (parts[ch + 'Range']) {
+      parts[ch + 'Range'].addEventListener('input', () => {
+        let hValue = parts.hhRange.value;
+        if (ch === 'hh' && hValue >= 359.5) {
+          hValue = 360;
+        }
+        updateFromHSL(hValue, parts.slRange.value, parts.llRange.value);
+      });
+    }
   });
 
   ['x', 'y', 'z'].forEach(ch => {
