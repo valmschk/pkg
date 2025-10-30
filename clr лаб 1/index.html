@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Color Converter — RGB • CMYK • HSV • HSL • XYZ • LAB • CIE</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>Color Converter — RGB • CMYK • HSV • HSL • XYZ • LAB</h1>
+    <p class="subtitle">Задавайте цвет полями, ползунками, палитрой или на диаграмме CIE. Все представления обновляются автоматически.</p>
+  </header>
+
+  <main>
+    <aside class="controls">
+      
+      <div class="block">
+        <h2>RGB</h2>
+        <div class="row">
+          <label for="rInput">R</label>
+          <input id="rInput" type="number" min="0" max="255" />
+          <input id="rRange" type="range" min="0" max="255" />
+        </div>
+        <div class="row">
+          <label for="gInput">G</label>
+          <input id="gInput" type="number" min="0" max="255" />
+          <input id="gRange" type="range" min="0" max="255" />
+        </div>
+        <div class="row">
+          <label for="bInput">B</label>
+          <input id="bInput" type="number" min="0" max="255" />
+          <input id="bRange" type="range" min="0" max="255" />
+        </div>
+      </div>
+
+      <div class="block">
+        <h2>CMYK 0–100%</h2>
+        <div class="row">
+          <label for="cInput">C</label>
+          <input id="cInput" type="number" min="0" max="100" />
+          <input id="cRange" type="range" min="0" max="100" />
+        </div>
+        <div class="row">
+          <label for="mInput">M</label>
+          <input id="mInput" type="number" min="0" max="100" />
+          <input id="mRange" type="range" min="0" max="100" />
+        </div>
+        <div class="row">
+          <label for="yInput">Y</label>
+          <input id="yInput" type="number" min="0" max="100" />
+          <input id="yRange" type="range" min="0" max="100" />
+        </div>
+        <div class="row">
+          <label for="kInput">K</label>
+          <input id="kInput" type="number" min="0" max="100" />
+          <input id="kRange" type="range" min="0" max="100" />
+        </div>
+      </div>
+
+      <div class="block">
+        <h2>HSV / HSB</h2>
+        <div class="row">
+          <label for="hInput">H</label>
+          <input id="hInput" type="number" min="0" max="360" />
+          <input id="hRange" type="range" min="0" max="360" />
+        </div>
+        <div class="row">
+          <label for="sInput">S</label>
+          <input id="sInput" type="number" min="0" max="100" />
+          <input id="sRange" type="range" min="0" max="100" />
+        </div>
+        <div class="row">
+          <label for="vInput">V</label>
+          <input id="vInput" type="number" min="0" max="100" />
+          <input id="vRange" type="range" min="0" max="100" />
+        </div>
+      </div>
+
+      <div class="block">
+        <h2>HSL / HLS</h2>
+        <div class="row">
+          <label for="hhInput">H</label>
+          <input id="hhInput" type="number" min="0" max="360" />
+          <input id="hhRange" type="range" min="0" max="360" />
+        </div>
+        <div class="row">
+          <label for="slInput">S</label>
+          <input id="slInput" type="number" min="0" max="100" />
+          <input id="slRange" type="range" min="0" max="100" />
+        </div>
+        <div class="row">
+          <label for="llInput">L</label>
+          <input id="llInput" type="number" min="0" max="100" />
+          <input id="llRange" type="range" min="0" max="100" />
+        </div>
+      </div>
+
+      <div class="block">
+        <h2>XYZ</h2>
+        <div class="row">
+          <label for="xInput">X</label>
+          <input id="xInput" type="number" step="0.01" />
+        </div>
+        <div class="row">
+          <label for="yInput">Y</label>
+          <input id="yInput" type="number" step="0.01" />
+        </div>
+        <div class="row">
+          <label for="zInput">Z</label>
+          <input id="zInput" type="number" step="0.01" />
+        </div>
+        <small class="muted">XYZ в относительных единицах D65</small>
+      </div>
+
+      <div class="block">
+        <h2>LAB</h2>
+        <div class="row">
+          <label for="lInput">L</label>
+          <input id="lInput" type="number" step="0.01" min="0" max="100" />
+        </div>
+        <div class="row">
+          <label for="aInput">a</label>
+          <input id="aInput" type="number" step="0.01" />
+        </div>
+        <div class="row">
+          <label for="b2Input">b</label>
+          <input id="b2Input" type="number" step="0.01" />
+        </div>
+        <small class="muted">LAB по D65</small>
+      </div>
+
+      <div class="block">
+        <h2>Палитра / Быстрые</h2>
+        <input id="colorPicker" type="color" value="#FF4D8A" />
+        <div class="presetRow" aria-hidden="false">
+          <button data-hex="#FF4D8A">#FF4D8A</button>
+          <button data-hex="#F29CCF">#F29CCF</button>
+          <button data-hex="#FFD1E6">#FFD1E6</button>
+          <button data-hex="#FFFFFF">#FFFFFF</button>
+          <button data-hex="#000000">#000000</button>
+        </div>
+        <div class="info">
+          <p><strong>HEX:</strong> <span id="hexOut"></span></p>
+          <p><strong>CSS:</strong> <code id="cssOut"></code></p>
+        </div>
+      </div>
+
+    </aside>
+
+    <section class="preview">
+      <div id="swatch" class="swatch" aria-label="Превью цвета"></div>
+      <div class="warning hidden" id="warning" aria-live="polite"></div>
+
+      <div class="cieBlock block">
+        <h2>CIE 1931 x,y</h2>
+        <canvas id="cieCanvas" width="420" height="330" aria-label="CIE 1931 диаграмма"></canvas>
+        <p class="muted">Кликните на диаграмму, чтобы выбрать цвет по x,y. Точка текущего цвета показана на диаграмме.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <small>Преобразования: CMYK ↔ RGB ↔ HSV ↔ HSL; RGB ↔ XYZ ↔ LAB (D65). Показывается предупреждение при обрезке значений.</small>
+  </footer>
+  <script src="app.js"></script>
+</body>
+</html>
