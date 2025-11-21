@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Визуализация: Буква М</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <div class="container">
+        <div class="glass-panel main-view">
+            <h2>🌟 3D Сцена (Каркасная модель)</h2>
+            <canvas id="canvas3d"></canvas>
+            <div class="axis-legend">
+                <span style="color:red">X — Red</span>
+                <span style="color:green">Y — Green</span>
+                <span style="color:blue">Z — Blue</span>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            
+            <div class="glass-panel controls">
+                <h3>🎛 Трансформации</h3>
+                
+                <div class="control-group">
+                    <label>Масштаб (Scale): <span id="val-scale">1.0</span></label>
+                    <input type="range" id="scale" min="0.1" max="3" step="0.1" value="1">
+                </div>
+
+                <div class="control-group">
+                    <label>Перенос (Translation)</label>
+                    <div class="multi-input">
+                        X: <input type="range" id="tx" min="-200" max="200" value="0">
+                        Y: <input type="range" id="ty" min="-200" max="200" value="0">
+                        Z: <input type="range" id="tz" min="-200" max="200" value="0">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label>Вращение вокруг произвольной оси</label>
+                    <div class="axis-inputs">
+                        <input type="number" id="ax" value="0" placeholder="x">
+                        <input type="number" id="ay" value="1" placeholder="y">
+                        <input type="number" id="az" value="0" placeholder="z">
+                    </div>
+                    <label>Угол (Angle): <span id="val-angle">0</span>°</label>
+                    <input type="range" id="angle" min="0" max="360" value="0">
+                    <button class="btn-reset" onclick="resetTransform()">Сбросить</button>
+                </div>
+            </div>
+
+            <div class="glass-panel matrix-box">
+                <h3>🔢 Итоговая Матрица</h3>
+                <div id="matrix-output" class="matrix-grid">
+                    </div>
+            </div>
+
+            <div class="glass-panel projections">
+                <h3>📐 Ортографические проекции</h3>
+                <div class="proj-grid">
+                    <div class="proj-item">
+                        <span>Oxy (Спереди)</span>
+                        <canvas id="projXY"></canvas>
+                    </div>
+                    <div class="proj-item">
+                        <span>Oxz (Сверху)</span>
+                        <canvas id="projXZ"></canvas>
+                    </div>
+                    <div class="proj-item">
+                        <span>Oyz (Сбоку)</span>
+                        <canvas id="projYZ"></canvas>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
