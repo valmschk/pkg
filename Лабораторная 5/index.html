@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Геометрический Конструктор | Алгоритмы Отсечения</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="header">
+                <h1>✂️ Геометрический Конструктор</h1>
+                <p class="subtitle">Визуализация алгоритмов отсечения</p>
+            </div>
+            
+            <div class="control-panel">
+                <div class="panel-section">
+                    <h3>📁 Загрузка данных</h3>
+                    <div class="file-upload">
+                        <label for="fileInput" class="upload-btn">
+                            <span class="icon">📄</span>
+                            Выберите файл
+                        </label>
+                        <input type="file" id="fileInput" accept=".txt">
+                        <div class="file-name" id="fileName">Файл не выбран</div>
+                    </div>
+                    <div class="hint">
+                        Формат: N отрезков, затем N строк (x1 y1 x2 y2), в конце Xmin Ymin Xmax Ymax
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>🎛️ Режим отсечения</h3>
+                    <div class="mode-selector">
+                        <div class="mode-option">
+                            <input type="radio" id="modeLines" name="mode" value="lines" checked onchange="processData()">
+                            <label for="modeLines" class="mode-label">
+                                <span class="mode-icon">📏</span>
+                                <span class="mode-text">
+                                    <strong>Отрезки</strong>
+                                    <small>Алгоритм Сазерленда-Коэна</small>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="mode-option">
+                            <input type="radio" id="modePoly" name="mode" value="poly" onchange="processData()">
+                            <label for="modePoly" class="mode-label">
+                                <span class="mode-icon">🔷</span>
+                                <span class="mode-text">
+                                    <strong>Многоугольник</strong>
+                                    <small>Алгоритм Сазерленда-Ходжмана</small>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>🎨 Визуализация</h3>
+                    <div class="legend">
+                        <div class="legend-item">
+                            <div class="color-swatch window"></div>
+                            <span>Отсекающее окно</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="color-swatch raw"></div>
+                            <span>Исходные данные</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="color-swatch clipped"></div>
+                            <span>Результат отсечения</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-panel">
+                <h3>📊 Информация</h3>
+                <div id="log" class="log-output">
+                    Загрузите файл для начала работы...
+                </div>
+            </div>
+        </div>
+
+        <div class="canvas-area">
+            <div class="canvas-header">
+                <div class="title">Область визуализации</div>
+                <div class="coordinates" id="coordinates">X: 0, Y: 0</div>
+            </div>
+            <div class="canvas-container">
+                <canvas id="canvas"></canvas>
+                <div class="grid-overlay" id="gridOverlay"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
