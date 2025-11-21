@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌈 Анализатор Метаданных Изображений</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-pink: #ff6b9d;
+            --light-pink: #ffafcc;
+            --primary-blue: #6a8cff;
+            --light-blue: #a7c7ff;
+            --primary-purple: #9d4edd;
+            --light-purple: #c77dff;
+            --gradient-bg: linear-gradient(135deg, #ffafcc 0%, #a7c7ff 50%, #c77dff 100%);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --text-dark: #2d3748;
+        }
+
+        body {
+            background: var(--gradient-bg);
+            background-attachment: fixed;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-dark);
+        }
+
+        .container {
+            max-width: 1400px;
+        }
+
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-title {
+            background: linear-gradient(135deg, var(--primary-pink), var(--primary-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-section {
+            background: linear-gradient(135deg, rgba(255, 175, 204, 0.1), rgba(167, 199, 255, 0.1));
+            border: 2px dashed var(--primary-pink);
+            transition: all 0.3s ease;
+        }
+
+        .upload-section:hover {
+            border-color: var(--primary-purple);
+            background: linear-gradient(135deg, rgba(255, 175, 204, 0.2), rgba(167, 199, 255, 0.2));
+            transform: translateY(-2px);
+        }
+
+        .btn-grad {
+            background: linear-gradient(135deg, var(--primary-pink), var(--primary-purple));
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 12px 30px;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(157, 78, 221, 0.3);
+        }
+
+        .btn-grad:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(157, 78, 221, 0.4);
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            color: white;
+        }
+
+        .table-custom {
+            background: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .table-custom thead {
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-purple));
+            color: white;
+        }
+
+        .table-custom th {
+            border: none;
+            padding: 15px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .table-custom td {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255, 175, 204, 0.3);
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .table-custom tbody tr:hover {
+            background: rgba(255, 175, 204, 0.1);
+            transform: scale(1.01);
+            transition: all 0.2s ease;
+        }
+
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .file-count-badge {
+            background: linear-gradient(135deg, var(--primary-pink), var(--primary-blue));
+            color: white;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .form-label {
+            color: var(--primary-purple);
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .form-control {
+            border: 2px solid var(--light-pink);
+            border-radius: 10px;
+            padding: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-purple);
+            box-shadow: 0 0 0 0.2rem rgba(157, 78, 221, 0.25);
+        }
+
+        .alert-custom {
+            background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-weight: 600;
+        }
+
+        .feature-icon {
+            font-size: 1.5rem;
+            margin-right: 10px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .supported-formats {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 10px;
+            padding: 10px 15px;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .floating-element {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container my-5">
+        
+        <div class="text-center mb-5">
+            <h1 class="header-title floating-element">
+                🖼️ Анализатор Метаданных Изображений
+            </h1>
+            <p class="lead text-muted">Профессиональный анализ EXIF данных и метаданных ваших изображений</p>
+            
+            <div class="supported-formats">
+                <span class="feature-icon">📁</span>
+                <strong>Поддерживаемые форматы:</strong> 
+                <span class="text-primary fw-bold">JPG, GIF, TIF, BMP, PNG, PCX</span>
+            </div>
+        </div>
+
+        <div class="glass-card p-4 mb-5 upload-section">
+            <form method="POST" enctype="multipart/form-data">
+                <div class="mb-4">
+                    <label for="folder-input" class="form-label">
+                        <span class="feature-icon">📂</span>
+                        Выберите папку с изображениями для анализа
+                    </label>
+                    <input type="file" id="folder-input" name="files" 
+                           class="form-control form-control-lg" 
+                           webkitdirectory directory multiple required>
+                    <div class="form-text text-muted mt-2">
+                        💡 Можно выбрать целую папку - браузер загрузит все файлы автоматически
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-grad btn-lg pulse">
+                        🚀 Начать Анализ Метаданных
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        {% if results %}
+            <div class="glass-card p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="mb-0">
+                        <span class="feature-icon">📊</span>
+                        Результаты Анализа
+                    </h2>
+                    <span class="file-count-badge">
+                        📁 Обработано файлов: {{ results|length }}
+                    </span>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-custom table-hover">
+                        <caption class="text-center p-3">
+                            <span class="feature-icon">✨</span>
+                            Детальная информация о метаданных изображений
+                        </caption>
+                        <thead class="sticky-header">
+                            <tr>
+                                <th>📄 Имя Файла</th>
+                                <th>🖼️ Формат</th>
+                                <th>📏 Размер (W x H, px)</th>
+                                <th>🎯 Разрешение (DPI)</th>
+                                <th>🎨 Глубина Цвета (Бит)</th>
+                                <th>🗜️ Сжатие</th>
+                                <th>🔍 Дополнительные Данные</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for file in results %}
+                            <tr>
+                                <td class="fw-bold text-primary">{{ file.filename }}</td>
+                                <td>
+                                    <span class="badge bg-primary rounded-pill">
+                                        {{ file.format }}
+                                    </span>
+                                </td>
+                                <td class="fw-semibold">{{ file.size }}</td>
+                                <td>{{ file.dpi }}</td>
+                                <td>
+                                    <span class="badge bg-info rounded-pill text-dark">
+                                        {{ file.depth }}
+                                    </span>
+                                </td>
+                                <td>{{ file.compression }}</td>
+                                <td class="small">{{ file.extra_info }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% elif error %}
+            <div class="alert alert-custom alert-dismissible fade show" role="alert">
+                <span class="feature-icon">⚠️</span>
+                <strong>Ошибка:</strong> {{ error }}
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+            </div>
+        {% endif %}
+        <div class="text-center mt-5">
+            <p class="text-muted">
+                <span class="feature-icon">💫</span>
+                Создано с помощью Flask + Pillow | Анализатор метаданных изображений
+            </p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.querySelector('.btn-grad').addEventListener('mouseenter', function() {
+            this.classList.add('pulse');
+        });
+        
+        document.querySelector('.btn-grad').addEventListener('mouseleave', function() {
+            this.classList.remove('pulse');
+        });
+
+        document.getElementById('folder-input').addEventListener('change', function(e) {
+            const fileCount = e.target.files.length;
+            if (fileCount > 0) {
+                const label = this.previousElementSibling;
+                label.innerHTML = `📂 Выбрана папка с ${fileCount} файлом(ами)`;
+                label.classList.add('text-success', 'fw-bold');
+            }
+        });
+    </script>
+</body>
+</html>
+
