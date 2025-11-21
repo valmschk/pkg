@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Processing Lab - Matrix Edition</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #00ff41;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(0, 255, 65, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(138, 43, 226, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(0, 191, 255, 0.1) 0%, transparent 50%);
+            animation: matrixPulse 8s ease-in-out infinite alternate;
+            z-index: -2;
+        }
+
+        @keyframes matrixPulse {
+            0% { opacity: 0.3; }
+            100% { opacity: 0.7; }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .esoteric-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .glitch-text {
+            font-size: 2.5em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            position: relative;
+            color: #00ff41;
+            text-shadow: 
+                0 0 10px #00ff41,
+                0 0 20px #00ff41,
+                0 0 40px #00ff41;
+        }
+
+        .subtitle {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .cyber-text {
+            font-size: 1.2em;
+            color: #8a2be2;
+            text-shadow: 0 0 10px #8a2be2;
+        }
+
+        .app-container {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 20px;
+            background: rgba(10, 10, 10, 0.8);
+            border: 1px solid #00ff41;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 
+                0 0 20px rgba(0, 255, 65, 0.3),
+                inset 0 0 20px rgba(0, 255, 65, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .control-panel {
+            background: rgba(20, 20, 20, 0.9);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #8a2be2;
+            box-shadow: 
+                inset 0 0 20px rgba(138, 43, 226, 0.2),
+                0 0 20px rgba(138, 43, 226, 0.1);
+        }
+
+        .panel-title {
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #00bfff;
+            text-shadow: 0 0 10px #00bfff;
+        }
+
+        .control-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .control-group h3 {
+            margin-bottom: 15px;
+            color: #00ff41;
+            border-bottom: 1px solid #00ff41;
+            padding-bottom: 5px;
+            font-size: 1em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-neon {
+            background: rgba(0, 255, 65, 0.1);
+            color: #00ff41;
+            border: 1px solid #00ff41;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+        }
+
+        .btn-neon:hover {
+            background: rgba(0, 255, 65, 0.2);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
+        }
+
+        .btn-mystic {
+            background: rgba(138, 43, 226, 0.1);
+            color: #8a2be2;
+            border: 1px solid #8a2be2;
+            box-shadow: 0 0 10px rgba(138, 43, 226, 0.3);
+        }
+
+        .btn-mystic:hover {
+            background: rgba(138, 43, 226, 0.2);
+            box-shadow: 0 0 20px rgba(138, 43, 226, 0.5);
+        }
+
+        .btn-test {
+            background: rgba(0, 191, 255, 0.1);
+            color: #00bfff;
+            border: 1px solid #00bfff;
+            box-shadow: 0 0 10px rgba(0, 191, 255, 0.3);
+            font-size: 11px;
+        }
+
+        .btn-test:hover {
+            background: rgba(0, 191, 255, 0.2);
+            box-shadow: 0 0 15px rgba(0, 191, 255, 0.5);
+        }
+
+        .method-option {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+            padding: 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            position: relative;
+        }
+
+        .method-option:hover {
+            background: rgba(0, 255, 65, 0.1);
+            border-color: #00ff41;
+        }
+
+        .method-option input {
+            display: none;
+        }
+
+        .checkmark {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #00ff41;
+            border-radius: 3px;
+            margin-right: 10px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .method-option input:checked + .checkmark {
+            background: #00ff41;
+            box-shadow: 0 0 10px #00ff41;
+        }
+
+        .method-option input:checked + .checkmark::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #000;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .slider-container {
+            margin: 15px 0;
+        }
+
+        .slider-container label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 11px;
+            color: #00bfff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .slider-neon {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: linear-gradient(90deg, #00ff41, #8a2be2);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider-neon::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #00ff41;
+            cursor: pointer;
+            box-shadow: 0 0 10px #00ff41;
+            border: 2px solid #000;
+        }
+
+        .slider-neon::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #00ff41;
+            cursor: pointer;
+            box-shadow: 0 0 10px #00ff41;
+            border: 2px solid #000;
+        }
+
+        .display-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            height: 600px;
+        }
+
+        .portal-frame {
+            background: rgba(20, 20, 20, 0.9);
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid #00bfff;
+            box-shadow: 
+                inset 0 0 20px rgba(0, 191, 255, 0.2),
+                0 0 20px rgba(0, 191, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .portal-title {
+            text-align: center;
+            font-size: 0.9em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #00bfff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .portal-view {
+            width: 100%;
+            height: 100%;
+            background: #000;
+            border-radius: 5px;
+            border: 1px solid #00ff41;
+            display: block;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: rgba(20, 20, 20, 0.8);
+            border-radius: 5px;
+            border: 1px solid #8a2be2;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            font-size: 11px;
+            color: #00ff41;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: #00ff41;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 10px #00ff41; }
+        }
+
+        .comparison-section {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(20, 20, 20, 0.9);
+            border-radius: 8px;
+            border: 1px solid #ffa500;
+            box-shadow: 0 0 10px rgba(255, 165, 0, 0.3);
+        }
+
+        .comparison-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .btn-comparison {
+            background: rgba(255, 165, 0, 0.15);
+            color: #ffa500;
+            border: 1px solid #ffa500;
+            font-size: 10px;
+            padding: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-comparison:hover {
+            background: rgba(255, 165, 0, 0.25);
+            box-shadow: 0 0 15px rgba(255, 165, 0, 0.5);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 1024px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .display-area {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            
+            .portal-frame {
+                height: 400px;
+            }
+            
+            .glitch-text {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="matrix-bg"></div>
+    
+    <div class="container">
+        <div class="esoteric-header">
+            <div class="glitch-text">IMAGE PROCESSING LAB</div>
+        </div>
+        
+        <div class="subtitle">
+            <div class="cyber-text">Пороговая обработка и НЧ фильтрация</div>
+            <div class="scanline"></div>
+        </div>
+
+        <div class="app-container">
+            <div class="control-panel">
+                <div class="panel-title">
+                    <span class="rune">⚡</span> ПАНЕЛЬ УПРАВЛЕНИЯ <span class="rune">⚡</span>
+                </div>
+
+                <div class="control-group">
+                    <h3>ЗАГРУЗКА ДАННЫХ</h3>
+                    <input type="file" id="fileInput" accept="image/*" hidden>
+                    <button class="btn btn-neon" onclick="document.getElementById('fileInput').click()">
+                        [ ЗАГРУЗИТЬ ИЗОБРАЖЕНИЕ ]
+                    </button>
+                    <button class="btn btn-mystic" onclick="app.download()">
+                        [ СОХРАНИТЬ РЕЗУЛЬТАТ ]
+                    </button>
+                </div>
+
+                <div class="control-group">
+                    <h3>ТЕСТОВЫЕ СЦЕНАРИИ</h3>
+                    <button class="btn btn-test" onclick="app.generateTest('noise')">
+                        Шум "Соль/Перец"
+                    </button>
+                    <button class="btn btn-test" onclick="app.generateTest('uneven')">
+                        Неравномерный свет
+                    </button>
+                    <button class="btn btn-test" onclick="app.generateTest('low_contrast')">
+                        Низкий контраст
+                    </button>
+                </div>
+
+                <div class="control-group">
+                    <h3>АЛГОРИТМЫ ОБРАБОТКИ</h3>
+                    <label class="method-option">
+                        <input type="radio" name="algo" value="original" checked>
+                        <span class="checkmark"></span>
+                        Оригинал
+                    </label>
+                    <label class="method-option">
+                        <input type="radio" name="algo" value="gaussian">
+                        <span class="checkmark"></span>
+                        Сглаживание (Гаусс)
+                    </label>
+                    <label class="method-option">
+                        <input type="radio" name="algo" value="median">
+                        <span class="checkmark"></span>
+                        Сглаживание (Медиана)
+                    </label>
+                    <label class="method-option">
+                        <input type="radio" name="algo" value="binary">
+                        <span class="checkmark"></span>
+                        Глоб. Порог (Ручной)
+                    </label>
+                    <label class="method-option">
+                        <input type="radio" name="algo" value="otsu">
+                        <span class="checkmark"></span>
+                        Глоб. Порог (Otsu)
+                    </label>
+                    <label class="method-option">
+                        <input type="radio" name="algo" value="adaptive">
+                        <span class="checkmark"></span>
+                        Адаптивный (Mean-C)
+                    </label>
+                </div>
+
+                <div class="control-group">
+                    <h3>ПАРАМЕТРЫ СИСТЕМЫ</h3>
+                    <div class="slider-container">
+                        <label>Размер ядра: <span id="val-kernel">3</span></label>
+                        <input type="range" class="slider-neon" id="p-kernel" min="3" max="15" step="2" value="3">
+                    </div>
+                    <div class="slider-container">
+                        <label>Порог: <span id="val-thresh">128</span></label>
+                        <input type="range" class="slider-neon" id="p-thresh" min="0" max="255" value="128">
+                    </div>
+                    <div class="slider-container">
+                        <label>Константа C: <span id="val-c">5</span></label>
+                        <input type="range" class="slider-neon" id="p-c" min="-20" max="50" value="5">
+                    </div>
+                    <div class="slider-container">
+                        <label>Размер окна: <span id="val-block">15</span></label>
+                        <input type="range" class="slider-neon" id="p-block" min="3" max="51" step="2" value="15">
+                    </div>
+                </div>
+
+                <div class="comparison-section">
+                    <h3>СРАВНЕНИЕ МЕТОДОВ</h3>
+                    <div class="comparison-buttons">
+                        <button class="btn btn-comparison" onclick="app.showComparison('noise')">
+                            Шум → Медиана
+                        </button>
+                        <button class="btn btn-comparison" onclick="app.showComparison('uneven')">
+                            Тень → Адаптивный
+                        </button>
+                        <button class="btn btn-comparison" onclick="app.showComparison('low_contrast')">
+                            Контраст → Otsu
+                        </button>
+                        <button class="btn btn-comparison" onclick="app.showMethodTable()">
+                            Сравнительная таблица
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="display-area">
+                <div class="portal-frame">
+                    <div class="portal-title">
+                        <span class="rune-small">⟁</span> ИСХОДНОЕ ИЗОБРАЖЕНИЕ <span class="rune-small">⟁</span>
+                    </div>
+                    <canvas id="cOrig" class="portal-view"></canvas>
+                </div>
+                <div class="portal-frame">
+                    <div class="portal-title">
+                        <span class="rune-small">⟁</span> РЕЗУЛЬТАТ ОБРАБОТКИ <span class="rune-small">⟁</span>
+                    </div>
+                    <canvas id="cProc" class="portal-view"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="status-bar">
+            <div class="status-item">
+                <div class="pulse-dot"></div>
+                СИСТЕМА АКТИВНА
+            </div>
+            <div class="status-item" id="status-method">
+                Алгоритм: Оригинал
+            </div>
+            <div class="status-item" id="status-size">
+                Размер: 500×400
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class ImageProcessor {
+            constructor() {
+                this.cOrig = document.getElementById('cOrig');
+                this.cProc = document.getElementById('cProc');
+                this.ctxOrig = this.cOrig.getContext('2d');
+                this.ctxProc = this.cProc.getContext('2d');
+                
+                this.imgData = null;
+                this.originalImage = null;
+
+                this.params = {
+                    kernel: 3,
+                    threshold: 128,
+                    c: 5,
+                    blockSize: 15
+                };
+
+                this.initListeners();
+                this.generateTest('uneven');
+            }
+
+            initListeners() {
+                document.getElementById('fileInput').addEventListener('change', (e) => {
+                    if(e.target.files[0]) this.loadImage(e.target.files[0]);
+                });
+
+                ['kernel', 'thresh', 'c', 'block'].forEach(key => {
+                    const el = document.getElementById('p-' + key);
+                    el.addEventListener('input', (e) => {
+                        this.params[key] = parseInt(e.target.value);
+                        document.getElementById('val-' + key).innerText = this.params[key];
+                        this.process();
+                    });
+                });
+
+                document.querySelectorAll('input[name="algo"]').forEach(r => {
+                    r.addEventListener('change', () => {
+                        document.getElementById('status-method').textContent = 
+                            `Алгоритм: ${r.parentElement.textContent.trim()}`;
+                        this.process();
+                    });
+                });
+            }
+
+            loadImage(source) {
+                const img = new Image();
+                img.onload = () => {
+                    this.resizeAndDraw(img);
+                };
+                
+                if (source instanceof File) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => img.src = e.target.result;
+                    reader.readAsDataURL(source);
+                } else if (typeof source === 'string') {
+                    img.src = source;
+                }
+            }
+
+            resizeAndDraw(img) {
+                const maxWidth = 500;
+                const maxHeight = 400;
+                let { width, height } = img;
+                
+                if (width > maxWidth) {
+                    height = (height * maxWidth) / width;
+                    width = maxWidth;
+                }
+                if (height > maxHeight) {
+                    width = (width * maxHeight) / height;
+                    height = maxHeight;
+                }
+
+                this.cOrig.width = this.cProc.width = width;
+                this.cOrig.height = this.cProc.height = height;
+
+                this.ctxOrig.clearRect(0, 0, width, height);
+                this.ctxOrig.drawImage(img, 0, 0, width, height);
+                this.imgData = this.ctxOrig.getImageData(0, 0, width, height);
+                
+                document.getElementById('status-size').textContent = 
+                    `Размер: ${width}×${height}`;
+                
+                this.process();
+            }
+
+            generateTest(type) {
+                const cvs = document.createElement('canvas');
+                cvs.width = 500;
+                cvs.height = 400;
+                const ctx = cvs.getContext('2d');
+
+                if (type === 'noise') {
+                    ctx.fillStyle = '#555';
+                    ctx.fillRect(0, 0, 500, 400);
+                    ctx.fillStyle = '#fff';
+                    ctx.font = 'bold 40px Arial';
+                    ctx.fillText("NOISE TEST", 120, 150);
+                    ctx.fillText("MEDIAN FILTER", 100, 220);
+                    
+                    const imgD = ctx.getImageData(0, 0, 500, 400);
+                    for(let i = 0; i < imgD.data.length; i += 4) {
+                        if(Math.random() < 0.1) {
+                            const color = Math.random() > 0.5 ? 255 : 0;
+                            imgD.data[i] = imgD.data[i+1] = imgD.data[i+2] = color;
+                        }
+                    }
+                    ctx.putImageData(imgD, 0, 0);
+                    
+                } else if (type === 'uneven') {
+                    const grd = ctx.createLinearGradient(0, 0, 500, 400);
+                    grd.addColorStop(0, "#ffffff");
+                    grd.addColorStop(1, "#333333");
+                    ctx.fillStyle = grd;
+                    ctx.fillRect(0, 0, 500, 400);
+                    
+                    ctx.fillStyle = "#666";
+                    ctx.font = "bold 35px Courier New";
+                    ctx.fillText("UNEVEN LIGHTING", 50, 120);
+                    ctx.fillText("ADAPTIVE THRESHOLD", 40, 200);
+                    ctx.fillText("SHADOW TEXT", 120, 280);
+                    
+                } else {
+                    ctx.fillStyle = '#777';
+                    ctx.fillRect(0, 0, 500, 400);
+                    ctx.fillStyle = '#888';
+                    ctx.font = 'bold 45px Arial';
+                    ctx.fillText("LOW CONTRAST", 80, 150);
+                    ctx.fillText("OTSU METHOD", 100, 230);
+                }
+                
+                this.loadImage(cvs.toDataURL());
+            }
+
+            process() {
+                if (!this.imgData) return;
+                
+                const method = document.querySelector('input[name="algo"]:checked').value;
+                const src = this.imgData.data;
+                const w = this.imgData.width;
+                const h = this.imgData.height;
+                const output = new ImageData(w, h);
+                const dst = output.data;
+
+                const gray = new Uint8ClampedArray(w * h);
+                for (let i = 0; i < w * h; i++) {
+                    gray[i] = 0.299 * src[i*4] + 0.587 * src[i*4+1] + 0.114 * src[i*4+2];
+                }
+
+                switch (method) {
+                    case 'original':
+                        output.data.set(src);
+                        break;
+
+                    case 'gaussian':
+                        this.applyGaussian(src, dst, w, h, this.params.kernel);
+                        break;
+
+                    case 'median':
+                        this.applyMedian(src, dst, w, h, this.params.kernel);
+                        break;
+
+                    case 'binary':
+                        this.applyGlobalThreshold(gray, dst, w, h, this.params.threshold);
+                        break;
+
+                    case 'otsu':
+                        const otsuThresh = this.getOtsuThreshold(gray);
+                        document.getElementById('val-thresh').innerText = otsuThresh + " (Auto)";
+                        this.applyGlobalThreshold(gray, dst, w, h, otsuThresh);
+                        break;
+
+                    case 'adaptive':
+                        this.applyAdaptiveMean(gray, dst, w, h, this.params.blockSize, this.params.c);
+                        break;
+                }
+
+                this.ctxProc.putImageData(output, 0, 0);
+            }
+
+            applyGaussian(src, dst, w, h, kernelSize) {
+                const r = Math.floor(kernelSize / 2);
+                for (let y = 0; y < h; y++) {
+                    for (let x = 0; x < w; x++) {
+                        let rSum = 0, gSum = 0, bSum = 0, count = 0;
+                        
+                        for (let ky = -r; ky <= r; ky++) {
+                            for (let kx = -r; kx <= r; kx++) {
+                                const py = Math.min(h-1, Math.max(0, y + ky));
+                                const px = Math.min(w-1, Math.max(0, x + kx));
+                                const idx = (py * w + px) * 4;
+                                rSum += src[idx];
+                                gSum += src[idx+1];
+                                bSum += src[idx+2];
+                                count++;
+                            }
+                        }
+                        const idx = (y * w + x) * 4;
+                        dst[idx] = rSum / count;
+                        dst[idx+1] = gSum / count;
+                        dst[idx+2] = bSum / count;
+                        dst[idx+3] = 255;
+                    }
+                }
+            }
+
+            applyMedian(src, dst, w, h, kernelSize) {
+                const r = Math.floor(kernelSize / 2);
+                for (let y = 0; y < h; y++) {
+                    for (let x = 0; x < w; x++) {
+                        let reds = [], greens = [], blues = [];
+                        
+                        for (let ky = -r; ky <= r; ky++) {
+                            for (let kx = -r; kx <= r; kx++) {
+                                const py = Math.min(h-1, Math.max(0, y + ky));
+                                const px = Math.min(w-1, Math.max(0, x + kx));
+                                const idx = (py * w + px) * 4;
+                                reds.push(src[idx]);
+                                greens.push(src[idx+1]);
+                                blues.push(src[idx+2]);
+                            }
+                        }
+                        
+                        reds.sort((a,b) => a-b);
+                        greens.sort((a,b) => a-b);
+                        blues.sort((a,b) => a-b);
+                        
+                        const mid = Math.floor(reds.length / 2);
+                        const idx = (y * w + x) * 4;
+                        dst[idx] = reds[mid];
+                        dst[idx+1] = greens[mid];
+                        dst[idx+2] = blues[mid];
+                        dst[idx+3] = 255;
+                    }
+                }
+            }
+
+            applyGlobalThreshold(gray, dst, w, h, thresh) {
+                for (let i = 0; i < w * h; i++) {
+                    const val = gray[i] >= thresh ? 255 : 0;
+                    dst[i*4] = dst[i*4+1] = dst[i*4+2] = val;
+                    dst[i*4+3] = 255;
+                }
+            }
+
+            getOtsuThreshold(gray) {
+                const hist = new Array(256).fill(0);
+                for (let i = 0; i < gray.length; i++) hist[gray[i]]++;
+
+                let total = gray.length;
+                let sum = 0;
+                for (let i = 0; i < 256; i++) sum += i * hist[i];
+
+                let sumB = 0, wB = 0, wF = 0;
+                let varMax = 0, threshold = 0;
+
+                for (let t = 0; t < 256; t++) {
+                    wB += hist[t];
+                    if (wB === 0) continue;
+                    wF = total - wB;
+                    if (wF === 0) break;
+
+                    sumB += t * hist[t];
+                    let mB = sumB / wB;
+                    let mF = (sum - sumB) / wF;
+
+                    let varBetween = wB * wF * (mB - mF) * (mB - mF);
+                    if (varBetween > varMax) {
+                        varMax = varBetween;
+                        threshold = t;
+                    }
+                }
+                return threshold;
+            }
+
+            applyAdaptiveMean(gray, dst, w, h, blockSize, C) {
+                const r = Math.floor(blockSize / 2);
+                
+                for (let y = 0; y < h; y++) {
+                    for (let x = 0; x < w; x++) {
+                        let sum = 0;
+                        let count = 0;
+
+                        for (let ky = -r; ky <= r; ky++) {
+                            for (let kx = -r; kx <= r; kx++) {
+                                const py = Math.min(h-1, Math.max(0, y + ky));
+                                const px = Math.min(w-1, Math.max(0, x + kx));
+                                sum += gray[py * w + px];
+                                count++;
+                            }
+                        }
+                        
+                        const mean = sum / count;
+                        const pixel = gray[y * w + x];
+                        const val = pixel > (mean - C) ? 255 : 0;
+
+                        const idx = (y * w + x) * 4;
+                        dst[idx] = dst[idx+1] = dst[idx+2] = val;
+                        dst[idx+3] = 255;
+                    }
+                }
+            }
+
+            download() {
+                if (!this.cProc) {
+                    alert('Нет обработанного изображения для сохранения');
+                    return;
+                }
+                const link = document.createElement('a');
+                link.download = 'processed_image.png';
+                link.href = this.cProc.toDataURL();
+                link.click();
+            }
+
+            showComparison(type) {
+                this.generateTest(type);
+                setTimeout(() => {
+                    let method, message;
+                    
+                    if (type === 'noise') {
+                        method = 'median';
+                        message = '🎯 ЗАШУМЛЕННЫЕ ИЗОБРАЖЕНИЯ:\n✓ Медианный фильтр > Гауссов фильтр\n✓ Эффективно убирает импульсный шум\n✓ Сохраняет четкие границы';
+                    } else if (type === 'uneven') {
+                        method = 'adaptive';
+                        message = '🔆 НЕРАВНОМЕРНОЕ ОСВЕЩЕНИЕ:\n✓ Адаптивные методы > Глобальные методы\n✓ Локальное вычисление порога\n✓ Текст читается даже в тенях';
+                    } else {
+                        method = 'otsu';
+                        message = '🌫️ МАЛОКОНТРАСТНЫЕ ИЗОБРАЖЕНИЯ:\n✓ Otsu > Ручной порог\n✓ Автоматический подбор порога\n✓ Не требует ручной настройки';
+                    }
+                    
+                    document.querySelector(`input[value="${method}"]`).checked = true;
+                    this.process();
+                    
+                    setTimeout(() => {
+                        alert(message);
+                    }, 500);
+                }, 100);
+            }
+
+            showMethodTable() {
+                const table = `📊 СРАВНИТЕЛЬНАЯ ТАБЛИЦА МЕТОДОВ:
+
+🎯 ШУМ "СОЛЬ/ПЕРЕЦ":
+• Медианный фильтр: ⭐⭐⭐⭐⭐
+• Гауссов фильтр: ⭐⭐☆☆☆
+• Глобальные пороги: ⭐☆☆☆☆
+
+🔆 НЕРАВНОМЕРНОЕ ОСВЕЩЕНИЕ:
+• Адаптивный порог: ⭐⭐⭐⭐⭐  
+• Otsu: ⭐⭐☆☆☆
+• Бинарный порог: ⭐☆☆☆☆
+
+🌫️ НИЗКИЙ КОНТРАСТ:
+• Otsu: ⭐⭐⭐⭐⭐
+• Адаптивный порог: ⭐⭐⭐☆☆
+• Бинарный порог: ⭐☆☆☆☆
+
+💡 ВЫВОД: Выбор метода зависит от типа изображения`;
+                alert(table);
+            }
+        }
+
+        const app = new ImageProcessor();
+    </script>
+</body>
+</html>
