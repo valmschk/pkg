@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Визуализация растровых алгоритмов</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🎯 Визуализация растровых алгоритмов</h1>
+            <p>Лабораторная работа по компьютерной графике</p>
+        </header>
+
+        <div class="main-content">
+            <div class="controls">
+                <div class="control-section">
+                    <h3>⚙️ Настройки построения</h3>
+                    
+                    <div class="input-group">
+                        <label for="algoSelect">Алгоритм:</label>
+                        <select id="algoSelect">
+                            <option value="step">👣 Пошаговый алгоритм</option>
+                            <option value="dda">📐 Алгоритм ЦДА</option>
+                            <option value="bresenham">🎯 Алгоритм Брезенхема (линия)</option>
+                            <option value="bresenhamCircle">⭕ Алгоритм Брезенхема (окружность)</option>
+                            <option value="wu">🌈 Алгоритм Ву (сглаживание)</option>
+                            <option value="pitteway">🔮 Алгоритм Кастла-Питвея (эллипс)</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Координаты:</label>
+                        <div class="coord-inputs">
+                            <div class="coord-pair">
+                                <span>Начало (x1, y1):</span>
+                                <input type="number" id="x1" value="0" placeholder="x1">
+                                <input type="number" id="y1" value="0" placeholder="y1">
+                            </div>
+                            <div class="coord-pair">
+                                <span>Конец/Радиус (x2, y2):</span>
+                                <input type="number" id="x2" value="8" placeholder="x2 / радиус">
+                                <input type="number" id="y2" value="5" placeholder="y2 / радиус">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Масштаб сетки: <span id="gridSizeVal">20</span>px</label>
+                        <input type="range" id="gridSize" min="5" max="50" value="20">
+                    </div>
+
+                    <div class="button-group">
+                        <button onclick="draw()" class="btn btn-primary">🖌️ Построить</button>
+                        <button onclick="clearCanvas()" class="btn btn-secondary">🗑️ Очистить</button>
+                        <button onclick="runTest()" class="btn btn-info">🧪 Тест корректности</button>
+                        <button onclick="showReport()" class="btn btn-report">📊 Отчет</button>
+                    </div>
+                </div>
+
+                <div class="stats-section">
+                    <h3>📊 Статистика</h3>
+                    <div class="stats">
+                        <div class="stat-item">
+                            <span>Время выполнения:</span>
+                            <span id="timeStat">0 мс</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>Количество пикселей:</span>
+                            <span id="pixelCount">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>Длина/Радиус:</span>
+                            <span id="lengthStat">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="log-section">
+                    <h3>📝 Лог вычислений</h3>
+                    <div id="logArea" class="log-area"></div>
+                </div>
+            </div>
+
+            <div class="canvas-container">
+                <div class="canvas-header">
+                    <h2>🎨 Холст построения</h2>
+                    <div class="cursor-info">
+                        Курсор: <span id="cursorCoords">(0, 0)</span>
+                    </div>
+                </div>
+                <canvas id="mainCanvas"></canvas>
+                <div class="legend">
+                    <div class="legend-item"><div class="color-box step"></div> Пошаговый</div>
+                    <div class="legend-item"><div class="color-box dda"></div> ЦДА</div>
+                    <div class="legend-item"><div class="color-box bresenham"></div> Брезенхем</div>
+                    <div class="legend-item"><div class="color-box circle"></div> Окружность</div>
+                    <div class="legend-item"><div class="color-box wu"></div> Ву</div>
+                    <div class="legend-item"><div class="color-box pitteway"></div> Эллипс</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="reportModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>📊 Отчет по алгоритмам</h2>
+            <div id="reportContent"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
