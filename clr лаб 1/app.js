@@ -1,3 +1,4 @@
+
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 const round = (v, d = 3) => Number(Number(v).toFixed(d));
 const isNum = v => isFinite(Number(v));
@@ -161,22 +162,22 @@ const parts = {
   hRange: $('hRange'), sRange: $('sRange'), vRange: $('vRange'),
   hhInput: $('hhInput'), slInput: $('slInput'), llInput: $('llInput'),
   hhRange: $('hhRange'), slRange: $('slRange'), llRange: $('llRange'),
-  xInput: $('xInput'), yInput: $('yInput'), zInput: $('zInput'),
+  xInput: $('xInput'), yInputXYZ: $('yInputXYZ'), zInput: $('zInput'),
   lInput: $('lInput'), aInput: $('aInput'), b2Input: $('b2Input'),
   colorPicker: $('colorPicker'), swatch: $('swatch'),
   hexOut: $('hexOut'), cssOut: $('cssOut'),
-  warning: $('warning'),
-  cieCanvas: $('cieCanvas')
+  warning: $('warning'), cieCanvas: $('cieCanvas')
 };
+
 let suspend = false;
 
 function setRGBUI(r, g, b) {
-  parts.rInput.value = round(r);
-  parts.gInput.value = round(g);
-  parts.bInput.value = round(b);
-  parts.rRange.value = round(r);
-  parts.gRange.value = round(g);
-  parts.bRange.value = round(b);
+  parts.rInput.value = Math.round(r);
+  parts.gInput.value = Math.round(g);
+  parts.bInput.value = Math.round(b);
+  parts.rRange.value = Math.round(r);
+  parts.gRange.value = Math.round(g);
+  parts.bRange.value = Math.round(b);
 }
 
 function setCMYKUI(c, m, y, k) {
@@ -191,41 +192,35 @@ function setCMYKUI(c, m, y, k) {
 }
 
 function setHSVUI(h, s, v) {
-  const hValue = Number(round(h)).toFixed(3);
-  const hForRange = hValue === '360.000' ? 360 : hValue;
-  
-  parts.hInput.value = hValue;
-  parts.sInput.value = Number(round(s)).toFixed(3);
-  parts.vInput.value = Number(round(v)).toFixed(3);
-  
-  parts.hRange.value = hForRange;
-  parts.sRange.value = Number(round(s)).toFixed(3);
-  parts.vRange.value = Number(round(v)).toFixed(3);
+  const hValue = Number(round(h));
+  parts.hInput.value = round(h);
+  parts.sInput.value = round(s);
+  parts.vInput.value = round(v);
+  parts.hRange.value = hValue === 360 ? 360 : round(h);
+  parts.sRange.value = round(s);
+  parts.vRange.value = round(v);
 }
 
 function setHSLUI(h, s, l) {
-  const hValue = Number(round(h)).toFixed(3);
-  const hForRange = hValue === '360.000' ? 360 : hValue;
-  
-  parts.hhInput.value = hValue;
-  parts.slInput.value = Number(round(s)).toFixed(3);
-  parts.llInput.value = Number(round(l)).toFixed(3);
-  
-  parts.hhRange.value = hForRange;
-  parts.slRange.value = Number(round(s)).toFixed(3);
-  parts.llRange.value = Number(round(l)).toFixed(3);
+  const hValue = Number(round(h));
+  parts.hhInput.value = round(h);
+  parts.slInput.value = round(s);
+  parts.llInput.value = round(l);
+  parts.hhRange.value = hValue === 360 ? 360 : round(h);
+  parts.slRange.value = round(s);
+  parts.llRange.value = round(l);
 }
 
 function setXYZUI(X, Y, Z) {
-  parts.xInput.value = Number(round(X)).toFixed(3);
-  parts.yInput.value = Number(round(Y)).toFixed(3);
-  parts.zInput.value = Number(round(Z)).toFixed(3);
+  parts.xInput.value = round(X, 2);
+  parts.yInputXYZ.value = round(Y, 2);
+  parts.zInput.value = round(Z, 2);
 }
 
 function setLABUI(L, a, b) {
-  parts.lInput.value = Number(round(L)).toFixed(3);
-  parts.aInput.value = Number(round(a)).toFixed(3);
-  parts.b2Input.value = Number(round(b)).toFixed(3);
+  parts.lInput.value = round(L, 2);
+  parts.aInput.value = round(a, 2);
+  parts.b2Input.value = round(b, 2);
 }
 
 function setPicker(hex) {
@@ -255,7 +250,10 @@ function showWarning(text) {
   }, 3500);
 }
 
-function toNumber(v, fallback = 0) { const n = Number(v); return isFinite(n) ? n : fallback; }
+function toNumber(v, fallback = 0) { 
+  const n = Number(v); 
+  return isFinite(n) ? n : fallback; 
+}
 
 function updateFromRGB(r, g, b, cause = 'rgb') {
   if (suspend) return;
@@ -264,167 +262,203 @@ function updateFromRGB(r, g, b, cause = 'rgb') {
     const rn = clamp(Math.round(toNumber(r)), 0, 255);
     const gn = clamp(Math.round(toNumber(g)), 0, 255);
     const bn = clamp(Math.round(toNumber(b)), 0, 255);
-    setRGBUI(rn, gn, bn);
+    
+    if (cause !== 'rgb') {
+      setRGBUI(rn, gn, bn);
+    }
+    
     const cmyk = rgbToCmyk(rn, gn, bn);
-    setCMYKUI(cmyk.c, cmyk.m, cmyk.y, cmyk.k);
+    if (cause !== 'cmyk') {
+      setCMYKUI(cmyk.c, cmyk.m, cmyk.y, cmyk.k);
+    }
+    
     const hsv = rgbToHsv(rn, gn, bn);
-    setHSVUI(hsv.h, hsv.s, hsv.v);
+    if (cause !== 'hsv') {
+      setHSVUI(hsv.h, hsv.s, hsv.v);
+    }
+    
     const hsl = rgbToHsl(rn, gn, bn);
-    setHSLUI(hsl.h, hsl.s, hsl.l);
+    if (cause !== 'hsl') {
+      setHSLUI(hsl.h, hsl.s, hsl.l);
+    }
+    
     const xyz = RGBtoXYZ(rn, gn, bn);
-    setXYZUI(xyz.X, xyz.Y, xyz.Z);
+    if (cause !== 'xyz') {
+      setXYZUI(xyz.X, xyz.Y, xyz.Z);
+    }
+    
     const lab = XYZtoLAB(xyz.X, xyz.Y, xyz.Z);
-    setLABUI(lab.L, lab.a, lab.b);
+    if (cause !== 'lab') {
+      setLABUI(lab.L, lab.a, lab.b);
+    }
+    
     const hex = rgbToHex(rn, gn, bn);
-    setPicker(hex); setSwatch(hex);
+    setPicker(hex); 
+    setSwatch(hex);
+    
     showWarning('');
-    if (typeof drawCIEPointFromXYZ === 'function') drawCIEPointFromXYZ(xyz.X, xyz.Y, xyz.Z);
+    
+    if (typeof drawCIEPointFromXYZ === 'function') {
+      drawCIEPointFromXYZ(xyz.X, xyz.Y, xyz.Z);
+    }
   } finally {
     suspend = false;
   }
 }
 
+function updateFromCMYK(c, m, y, k) {
+  const cn = clamp(toNumber(c), 0, 100);
+  const mn = clamp(toNumber(m), 0, 100);
+  const yn = clamp(toNumber(y), 0, 100);
+  const kn = clamp(toNumber(k), 0, 100);
+  
+  setCMYKUI(cn, mn, yn, kn);
+  
+  const result = cmykToRgb(cn, mn, yn, kn);
+  const rgb = result.rgb;
+  
+  updateFromRGB(rgb.r, rgb.g, rgb.b, 'cmyk');
+  
+  const raw = result.raw;
+  if (raw.r < 0 || raw.r > 255 || raw.g < 0 || raw.g > 255 || raw.b < 0 || raw.b > 255) {
+    showWarning('Внимание: при преобразовании CMYK→RGB некоторые компоненты были обрезаны до допустимого диапазона.');
+  }
+}
+
 function updateFromHSV(h, s, v) {
-  if (suspend) return;
-  suspend = true;
-  try {
-    let hn = toNumber(h);
-    if (hn === 360) {
-      hn = 360; 
-    } else {
-      hn = ((hn % 360) + 360) % 360; 
-    }
-    
-    const sn = clamp(toNumber(s), 0, 100);
-    const vn = clamp(toNumber(v), 0, 100);
-    setHSVUI(hn, sn, vn);
-    const rgb = hsvToRgb(hn, sn, vn);
-    updateFromRGB(rgb.r, rgb.g, rgb.b, 'hsv');
-  } finally { suspend = false; }
+  let hn = toNumber(h);
+  if (hn === 360) {
+    hn = 360; 
+  } else {
+    hn = ((hn % 360) + 360) % 360; 
+  }
+  
+  const sn = clamp(toNumber(s), 0, 100);
+  const vn = clamp(toNumber(v), 0, 100);
+  
+  setHSVUI(hn, sn, vn);
+  
+  const rgb = hsvToRgb(hn, sn, vn);
+  
+  updateFromRGB(rgb.r, rgb.g, rgb.b, 'hsv');
 }
 
 function updateFromHSL(h, s, l) {
-  if (suspend) return;
-  suspend = true;
-  try {
-    let hn = toNumber(h);
-    if (hn === 360) {
-      hn = 360; 
-    } else {
-      hn = ((hn % 360) + 360) % 360; 
-    }
-    
-    const sn = clamp(toNumber(s), 0, 100);
-    const ln = clamp(toNumber(l), 0, 100);
-    setHSLUI(hn, sn, ln);
-    const rgb = hslToRgb(hn, sn, ln);
-    updateFromRGB(rgb.r, rgb.g, rgb.b, 'hsl');
-  } finally { suspend = false; }
-}
-
-function updateFromCMYK(c, m, y, k) {
-  if (suspend) return;
-  suspend = true;
-  try {
-    const cn = clamp(toNumber(c), 0, 100);
-    const mn = clamp(toNumber(m), 0, 100);
-    const yn = clamp(toNumber(y), 0, 100);
-    const kn = clamp(toNumber(k), 0, 100);
-    setCMYKUI(cn, mn, yn, kn);
-    const result = cmykToRgb(cn, mn, yn, kn);
-    const raw = result.raw;
-    const rgb = result.rgb;
-    const rawOutOfRange = raw.r < 0 || raw.r > 255 || raw.g < 0 || raw.g > 255 || raw.b < 0 || raw.b > 255;
-    updateFromRGB(rgb.r, rgb.g, rgb.b, 'cmyk');
-    if (rawOutOfRange) showWarning('Внимание: при преобразовании CMYK→RGB некоторые компоненты были обрезаны до допустимого диапазона.');
-    else showWarning('');
-  } finally { suspend = false; }
+  let hn = toNumber(h);
+  if (hn === 360) {
+    hn = 360; 
+  } else {
+    hn = ((hn % 360) + 360) % 360; 
+  }
+  
+  const sn = clamp(toNumber(s), 0, 100);
+  const ln = clamp(toNumber(l), 0, 100);
+  
+  setHSLUI(hn, sn, ln);
+  
+  const rgb = hslToRgb(hn, sn, ln);
+  
+  updateFromRGB(rgb.r, rgb.g, rgb.b, 'hsl');
 }
 
 function updateFromXYZ(X, Y, Z) {
-  if (suspend) return;
-  suspend = true;
-  try {
-    const Xn = toNumber(X, 0);
-    const Yn = toNumber(Y, 0);
-    const Zn = toNumber(Z, 0);
-    setXYZUI(Xn, Yn, Zn);
-    const result = XYZtoRGB(Xn, Yn, Zn);
-    const raw = result.raw;
-    const rgb = result.rgb;
-    const rawOut = raw.r < 0 || raw.r > 255 || raw.g < 0 || raw.g > 255 || raw.b < 0 || raw.b > 255;
-    updateFromRGB(rgb.r, rgb.g, rgb.b, 'xyz');
-    if (rawOut) showWarning('Внимание: XYZ → RGB привело к выходу за sRGB гамму; цвет был приведён к допустимому диапазону.');
-    else showWarning('');
-  } finally { suspend = false; }
+  const Xn = toNumber(X, 0);
+  const Yn = toNumber(Y, 0);
+  const Zn = toNumber(Z, 0);
+  
+  setXYZUI(Xn, Yn, Zn);
+  
+  const result = XYZtoRGB(Xn, Yn, Zn);
+  const rgb = result.rgb;
+  
+  updateFromRGB(rgb.r, rgb.g, rgb.b, 'xyz');
+  
+  const raw = result.raw;
+  if (raw.r < 0 || raw.r > 255 || raw.g < 0 || raw.g > 255 || raw.b < 0 || raw.b > 255) {
+    showWarning('Внимание: XYZ → RGB привело к выходу за sRGB гамму; цвет был приведён к допустимому диапазону.');
+  }
 }
 
 function updateFromLAB(L, a, b) {
-  if (suspend) return;
-  suspend = true;
-  try {
-    const Ln = toNumber(L, 0);
-    const an = toNumber(a, 0);
-    const bn = toNumber(b, 0);
-    setLABUI(Ln, an, bn);
-    const xyz = LABtoXYZ(Ln, an, bn);
-    setXYZUI(xyz.X, xyz.Y, xyz.Z);
-    updateFromXYZ(xyz.X, xyz.Y, xyz.Z);
-  } finally { suspend = false; }
+  const Ln = toNumber(L, 0);
+  const an = toNumber(a, 0);
+  const bn = toNumber(b, 0);
+  
+  setLABUI(Ln, an, bn);
+  
+  const xyz = LABtoXYZ(Ln, an, bn);
+  
+  updateFromXYZ(xyz.X, xyz.Y, xyz.Z);
 }
 
 function attachEvents() {
-  ['r', 'g', 'b'].forEach(ch => {
-    if (parts[ch + 'Input']) parts[ch + 'Input'].addEventListener('input', () => updateFromRGB(parts.rInput.value, parts.gInput.value, parts.bInput.value));
-    if (parts[ch + 'Range']) parts[ch + 'Range'].addEventListener('input', () => updateFromRGB(parts.rRange.value, parts.gRange.value, parts.bRange.value));
+  if (parts.rInput) parts.rInput.addEventListener('input', () => updateFromRGB(parts.rInput.value, parts.gInput.value, parts.bInput.value, 'rgb'));
+  if (parts.gInput) parts.gInput.addEventListener('input', () => updateFromRGB(parts.rInput.value, parts.gInput.value, parts.bInput.value, 'rgb'));
+  if (parts.bInput) parts.bInput.addEventListener('input', () => updateFromRGB(parts.rInput.value, parts.gInput.value, parts.bInput.value, 'rgb'));
+  
+  if (parts.rRange) parts.rRange.addEventListener('input', () => updateFromRGB(parts.rRange.value, parts.gRange.value, parts.bRange.value, 'rgb'));
+  if (parts.gRange) parts.gRange.addEventListener('input', () => updateFromRGB(parts.rRange.value, parts.gRange.value, parts.bRange.value, 'rgb'));
+  if (parts.bRange) parts.bRange.addEventListener('input', () => updateFromRGB(parts.rRange.value, parts.gRange.value, parts.bRange.value, 'rgb'));
+
+  if (parts.cInput) parts.cInput.addEventListener('input', () => updateFromCMYK(parts.cInput.value, parts.mInput.value, parts.yInput.value, parts.kInput.value));
+  if (parts.mInput) parts.mInput.addEventListener('input', () => updateFromCMYK(parts.cInput.value, parts.mInput.value, parts.yInput.value, parts.kInput.value));
+  if (parts.yInput) parts.yInput.addEventListener('input', () => updateFromCMYK(parts.cInput.value, parts.mInput.value, parts.yInput.value, parts.kInput.value));
+  if (parts.kInput) parts.kInput.addEventListener('input', () => updateFromCMYK(parts.cInput.value, parts.mInput.value, parts.yInput.value, parts.kInput.value));
+  
+  if (parts.cRange) parts.cRange.addEventListener('input', () => updateFromCMYK(parts.cRange.value, parts.mRange.value, parts.yRange.value, parts.kRange.value));
+  if (parts.mRange) parts.mRange.addEventListener('input', () => updateFromCMYK(parts.cRange.value, parts.mRange.value, parts.yRange.value, parts.kRange.value));
+  if (parts.yRange) parts.yRange.addEventListener('input', () => updateFromCMYK(parts.cRange.value, parts.mRange.value, parts.yRange.value, parts.kRange.value));
+  if (parts.kRange) parts.kRange.addEventListener('input', () => updateFromCMYK(parts.cRange.value, parts.mRange.value, parts.yRange.value, parts.kRange.value));
+
+  if (parts.hInput) parts.hInput.addEventListener('input', () => updateFromHSV(parts.hInput.value, parts.sInput.value, parts.vInput.value));
+  if (parts.sInput) parts.sInput.addEventListener('input', () => updateFromHSV(parts.hInput.value, parts.sInput.value, parts.vInput.value));
+  if (parts.vInput) parts.vInput.addEventListener('input', () => updateFromHSV(parts.hInput.value, parts.sInput.value, parts.vInput.value));
+  
+  if (parts.hRange) parts.hRange.addEventListener('input', () => {
+    let hValue = parts.hRange.value;
+    if (hValue >= 359.5) hValue = 360;
+    updateFromHSV(hValue, parts.sInput.value, parts.vInput.value);
+  });
+  if (parts.sRange) parts.sRange.addEventListener('input', () => {
+    updateFromHSV(parts.hInput.value, parts.sRange.value, parts.vInput.value);
+  });
+  if (parts.vRange) parts.vRange.addEventListener('input', () => {
+    updateFromHSV(parts.hInput.value, parts.sInput.value, parts.vRange.value);
   });
 
-  ['c', 'm', 'y', 'k'].forEach(ch => {
-    if (parts[ch + 'Input']) parts[ch + 'Input'].addEventListener('input', () => updateFromCMYK(parts.cInput.value, parts.mInput.value, parts.yInput.value, parts.kInput.value));
-    if (parts[ch + 'Range']) parts[ch + 'Range'].addEventListener('input', () => updateFromCMYK(parts.cRange.value, parts.mRange.value, parts.yRange.value, parts.kRange.value));
+  if (parts.hhInput) parts.hhInput.addEventListener('input', () => updateFromHSL(parts.hhInput.value, parts.slInput.value, parts.llInput.value));
+  if (parts.slInput) parts.slInput.addEventListener('input', () => updateFromHSL(parts.hhInput.value, parts.slInput.value, parts.llInput.value));
+  if (parts.llInput) parts.llInput.addEventListener('input', () => updateFromHSL(parts.hhInput.value, parts.slInput.value, parts.llInput.value));
+  
+  if (parts.hhRange) parts.hhRange.addEventListener('input', () => {
+    let hValue = parts.hhRange.value;
+    if (hValue >= 359.5) hValue = 360;
+    updateFromHSL(hValue, parts.slInput.value, parts.llInput.value);
+  });
+  if (parts.slRange) parts.slRange.addEventListener('input', () => {
+    updateFromHSL(parts.hhInput.value, parts.slRange.value, parts.llInput.value);
+  });
+  if (parts.llRange) parts.llRange.addEventListener('input', () => {
+    updateFromHSL(parts.hhInput.value, parts.slInput.value, parts.llRange.value);
   });
 
-  ['h', 's', 'v'].forEach(ch => {
-    if (parts[ch + 'Input']) parts[ch + 'Input'].addEventListener('input', () => updateFromHSV(parts.hInput.value, parts.sInput.value, parts.vInput.value));
-    if (parts[ch + 'Range']) {
-      parts[ch + 'Range'].addEventListener('input', () => {
-        let hValue = parts.hRange.value;
-        if (ch === 'h' && hValue >= 359.5) {
-          hValue = 360;
-        }
-        updateFromHSV(hValue, parts.sRange.value, parts.vRange.value);
-      });
-    }
-  });
+  if (parts.xInput) parts.xInput.addEventListener('input', () => updateFromXYZ(parts.xInput.value, parts.yInputXYZ.value, parts.zInput.value));
+  if (parts.yInputXYZ) parts.yInputXYZ.addEventListener('input', () => updateFromXYZ(parts.xInput.value, parts.yInputXYZ.value, parts.zInput.value));
+  if (parts.zInput) parts.zInput.addEventListener('input', () => updateFromXYZ(parts.xInput.value, parts.yInputXYZ.value, parts.zInput.value));
 
-  ['hh', 'sl', 'll'].forEach(ch => {
-    if (parts[ch + 'Input']) parts[ch + 'Input'].addEventListener('input', () => updateFromHSL(parts.hhInput.value, parts.slInput.value, parts.llInput.value));
-    if (parts[ch + 'Range']) {
-      parts[ch + 'Range'].addEventListener('input', () => {
-        let hValue = parts.hhRange.value;
-        if (ch === 'hh' && hValue >= 359.5) {
-          hValue = 360;
-        }
-        updateFromHSL(hValue, parts.slRange.value, parts.llRange.value);
-      });
-    }
-  });
+  if (parts.lInput) parts.lInput.addEventListener('input', () => updateFromLAB(parts.lInput.value, parts.aInput.value, parts.b2Input.value));
+  if (parts.aInput) parts.aInput.addEventListener('input', () => updateFromLAB(parts.lInput.value, parts.aInput.value, parts.b2Input.value));
+  if (parts.b2Input) parts.b2Input.addEventListener('input', () => updateFromLAB(parts.lInput.value, parts.aInput.value, parts.b2Input.value));
 
-  ['x', 'y', 'z'].forEach(ch => {
-    if (parts[ch + 'Input']) parts[ch + 'Input'].addEventListener('input', () => updateFromXYZ(parts.xInput.value, parts.yInput.value, parts.zInput.value));
-  });
-
-  ['l', 'a', 'b2'].forEach(ch => {
-    if (parts[ch + 'Input']) parts[ch + 'Input'].addEventListener('input', () => updateFromLAB(parts.lInput.value, parts.aInput.value, parts.b2Input.value));
-  });
-
-  if (parts.colorPicker) parts.colorPicker.addEventListener('input', e => {
-    const hex = e.target.value;
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
-    updateFromRGB(r, g, b);
-  });
+  if (parts.colorPicker) {
+    parts.colorPicker.addEventListener('input', e => {
+      const hex = e.target.value;
+      const r = parseInt(hex.slice(1, 3), 16);
+      const g = parseInt(hex.slice(3, 5), 16);
+      const b = parseInt(hex.slice(5, 7), 16);
+      updateFromRGB(r, g, b, 'picker');
+    });
+  }
 
   document.querySelectorAll('.presetRow button').forEach(btn => {
     btn.addEventListener('click', e => {
@@ -434,7 +468,7 @@ function attachEvents() {
       const r = parseInt(hex.slice(1, 3), 16);
       const g = parseInt(hex.slice(3, 5), 16);
       const b = parseInt(hex.slice(5, 7), 16);
-      updateFromRGB(r, g, b);
+      updateFromRGB(r, g, b, 'preset');
     });
   });
 
@@ -458,8 +492,10 @@ function attachEvents() {
 function initCIECanvas() {
   const canvas = parts.cieCanvas;
   if (!canvas) return;
+  
   const ctx = canvas.getContext('2d');
   const w = canvas.width, h = canvas.height;
+  
   const img = ctx.createImageData(w, h);
   for (let j = 0; j < h; j++) {
     for (let i = 0; i < w; i++) {
@@ -468,10 +504,15 @@ function initCIECanvas() {
       const Y = 1.0;
       const X = (x * Y) / (y || 1e-9);
       const Z = ((1 - x - y) * Y) / (y || 1e-9);
+      
       const conv = XYZtoRGB(X * 100, Y * 100, Z * 100);
       const r = conv.rgb.r, g = conv.rgb.g, b = conv.rgb.b;
+      
       const idx = (j * w + i) * 4;
-      img.data[idx] = r; img.data[idx + 1] = g; img.data[idx + 2] = b; img.data[idx + 3] = 255;
+      img.data[idx] = r; 
+      img.data[idx + 1] = g; 
+      img.data[idx + 2] = b; 
+      img.data[idx + 3] = 255;
     }
   }
   ctx.putImageData(img, 0, 0);
@@ -498,7 +539,11 @@ function initCIECanvas() {
     drawPoint(px, py);
   }
 
-  const currXYZ = RGBtoXYZ(toNumber(parts.rInput.value || 255), toNumber(parts.gInput.value || 77), toNumber(parts.bInput.value || 138));
+  const currXYZ = RGBtoXYZ(
+    toNumber(parts.rInput.value || 255), 
+    toNumber(parts.gInput.value || 77), 
+    toNumber(parts.bInput.value || 138)
+  );
   drawPointFromXYZ(currXYZ.X, currXYZ.Y, currXYZ.Z);
 
   window.drawCIEPointFromXYZ = function (X, Y, Z) {
@@ -507,28 +552,42 @@ function initCIECanvas() {
 
   canvas.addEventListener('click', (e) => {
     const rect = canvas.getBoundingClientRect();
-    const px = Math.round((e.clientX - rect.left) * (canvas.width / rect.width));
-    const py = Math.round((e.clientY - rect.top) * (canvas.height / rect.height));
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    const px = Math.round((e.clientX - rect.left) * scaleX);
+    const py = Math.round((e.clientY - rect.top) * scaleY);
+    
     const x = px / (w - 1) * 0.8;
     const y = 1 - (py / (h - 1) * 0.9);
-    const Y = 1.0;
-    const X = (x * Y) / (y || 1e-9);
-    const Z = ((1 - x - y) * Y) / (y || 1e-9);
-    const conv = XYZtoRGB(X * 100, Y * 100, Z * 100);
+    
+    const Yval = 1.0;
+    const Xval = (x * Yval) / (y || 1e-9);
+    const Zval = ((1 - x - y) * Yval) / (y || 1e-9);
+    
+    const conv = XYZtoRGB(Xval * 100, Yval * 100, Zval * 100);
     const rgb = conv.rgb;
-    updateFromRGB(rgb.r, rgb.g, rgb.b);
+    
+    updateFromRGB(rgb.r, rgb.g, rgb.b, 'cie');
     drawPoint(px, py);
+    
     if (conv.raw.r < 0 || conv.raw.r > 255 || conv.raw.g < 0 || conv.raw.g > 255 || conv.raw.b < 0 || conv.raw.b > 255) {
       showWarning('Выбранная точка x,y выходит за sRGB-гамму; цвет был приведён к области sRGB.');
-    } else showWarning('');
+    } else {
+      showWarning('');
+    }
   });
 }
 
-window.drawCIEPointFromXYZ = () => { };
+window.drawCIEPointFromXYZ = () => {};
 
 function init() {
   attachEvents();
-  updateFromRGB(255, 77, 138);
+  updateFromRGB(255, 77, 138, 'init');
 }
 
-init();
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
